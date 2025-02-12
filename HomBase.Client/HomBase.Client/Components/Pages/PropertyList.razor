@@ -1,0 +1,23 @@
+﻿@page "/propertiies"
+@using HomBase.Client.Models
+@using HomBase.Client.Services
+@inject PropertyService PropertyService  // ✅ Inject PropertyService
+
+<h3>Properties</h3>
+
+<ul>
+    @foreach (var property in properties)
+    {
+        <li>@property.Title</li>
+    }
+</ul>
+
+@code {
+    private List<Property> properties = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch properties asynchronously
+        properties = await PropertyService.GetPropertiesAsync();
+    }
+}

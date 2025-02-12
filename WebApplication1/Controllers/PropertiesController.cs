@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using HomBaseAPI.Data;
 using HomBaseAPI.Model;
 
-namespace HomBaseAPI.Controllers
+namespace HomBase.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -21,38 +18,44 @@ namespace HomBaseAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Properties
+        // POST: api/properties
+        [HttpPost]
+        public async Task<ActionResult<Property>> CreateProperty([FromBody] Property property)
+        {
+            _context.Properties.Add(property);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetProperty), new { id = property.Id }, property);
+        }
+
+        // GET: api/properties
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Property>>> GetProperties()
         {
             return await _context.Properties.ToListAsync();
         }
 
-        // GET: api/Properties/5
+        // GET: api/properties/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Property>> GetProperty(int id)
         {
-            var @property = await _context.Properties.FindAsync(id);
-
-            if (@property == null)
+            var property = await _context.Properties.FindAsync(id);
+            if (property == null)
             {
                 return NotFound();
             }
-
-            return @property;
+            return property;
         }
 
-        // PUT: api/Properties/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // PUT: api/properties/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProperty(int id, Property @property)
+        public async Task<IActionResult> UpdateProperty(int id, [FromBody] Property property)
         {
-            if (id != @property.Id)
+            if (id != property.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(@property).State = EntityState.Modified;
+            _context.Entry(property).State = EntityState.Modified;
 
             try
             {
@@ -73,28 +76,17 @@ namespace HomBaseAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Properties
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Property>> PostProperty(Property @property)
-        {
-            _context.Properties.Add(@property);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetProperty", new { id = @property.Id }, @property);
-        }
-
-        // DELETE: api/Properties/5
+        // DELETE: api/properties/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProperty(int id)
         {
-            var @property = await _context.Properties.FindAsync(id);
-            if (@property == null)
+            var property = await _context.Properties.FindAsync(id);
+            if (property == null)
             {
                 return NotFound();
             }
 
-            _context.Properties.Remove(@property);
+            _context.Properties.Remove(property);
             await _context.SaveChangesAsync();
 
             return NoContent();
