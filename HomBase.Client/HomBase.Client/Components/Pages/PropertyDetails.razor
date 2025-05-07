@@ -1,0 +1,54 @@
+﻿@page "/properties/{id:int}"
+@using HomBase.Client.Models
+@using HomBase.Client.Services
+@inject PropertyService PropertyService
+
+<h3 class="mb-4">Property Details</h3>
+
+@if (property == null)
+{
+    <div class="alert alert-warning">Loading property details...</div>
+}
+else
+{
+    <div class="card mb-4">
+        <img src="data:image/jpeg;base64,@Convert.ToBase64String(property.ImageData)" class="card-img-top" alt="Property Image" style="height: 300px; object-fit: cover;" />
+        <div class="card-body">
+            <h5 class="card-title">@property.Title</h5>
+            <p class="card-text text-muted">Location: @property.Location</p>
+            <p class="card-text">Price: @property.Price:C</p>
+            <p class="card-text">Description: @property.Description</p>
+            <p class="card-text">Bedrooms: @property.Bedrooms</p>
+            <p class="card-text">Bathrooms: @property.Bathrooms</p>
+            <p class="card-text">Size: @property.Size sqm</p>
+            <p class="card-text">Date Listed: @property.DateListed.ToString("yyyy-MM-dd")</p>
+            <hr />
+            <h6>Interested Users:</h6>
+            @if (property.Interests == null || !property.Interests.Any())
+            {
+                <p class="text-muted">No users have shown interest yet.</p>
+            }
+            else
+            {
+                <ul class="list-group">
+                    @foreach (var interest in property.Interests)
+                    {
+                        <li class="list-group-item">User ID: @interest.UserId (Expressed interest on @interest.DateExpressed.ToString("yyyy-MM-dd"))</li>
+                    }
+                </ul>
+            }
+            <a href="/properties" class="btn btn-primary mt-3">Back to Properties</a>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    private Property property;
+
+    protected override async Task OnInitializedAsync()
+    {
+        property = await PropertyService.GetPropertyByIdAsync(id);
+    }
+}
+

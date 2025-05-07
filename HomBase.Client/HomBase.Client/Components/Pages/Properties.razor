@@ -3,22 +3,82 @@
 @using HomBase.Client.Services
 @inject PropertyService PropertyService  // ✅ Inject PropertyService
 
-<h3>Properties</h3>
+<h3 class="mb-4">Properties</h3>
 
-<ul>
+<div class="row">
     @foreach (var property in properties)
     {
-        <li>@property.Title</li>
-        <li>@property.Location</li>
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm hover-effect">
+                @if (property.ImageData != null)
+                {
+                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(property.ImageData)" class="card-img-top" alt="Property Image" style="height: 150px; object-fit: cover;" />
+                }
+                else
+                {
+                    <img src="https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg" class="card-img-top" alt="No Image" style="height: 200px; object-fit: cover;" />
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@property.Title</h5>
+                    <p class="card-text text-muted">@property.Location</p>
+                    <a href="/properties/@property.Id" class="btn btn-primary pull-left">View Details</a>
+                    <a class="btn btn-danger btn-sm pull-right" @onclick="() => ConfirmDelete(property)">
+                        <span class="glyphicon glyphicon-trash">Delete</span>
+                    </a>
+                </div>
+            </div>
+        </div>
     }
-</ul>
+</div>
+
+@if (propertyToDelete != null)
+{
+    <div class="modal fade show" tabindex="-1" style="display: block; background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="CancelDelete"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete <strong>@propertyToDelete.Title</strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+                    <button class="btn btn-danger" @onclick="DeleteProperty">Yes, Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
     private List<Property> properties = new();
+    private Property? propertyToDelete;
 
     protected override async Task OnInitializedAsync()
     {
         // Fetch properties asynchronously
         properties = await PropertyService.GetPropertiesAsync();
+    }
+
+    private void ConfirmDelete(Property property)
+    {
+        propertyToDelete = property;
+    }
+
+    private void CancelDelete()
+    {
+        propertyToDelete = null;
+    }
+
+    private async Task DeleteProperty()
+    {
+        if (propertyToDelete != null)
+        {
+            await PropertyService.DeletePropertyAsync(propertyToDelete.Id);
+            properties.Remove(propertyToDelete);
+            propertyToDelete = null;
+        }
     }
 }

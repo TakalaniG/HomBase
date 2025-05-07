@@ -22,6 +22,7 @@ namespace HomBase.Controllers
         [HttpPost]
         public async Task<ActionResult<Property>> CreateProperty([FromBody] Property property)
         {
+            property.DateListed = DateTime.UtcNow;
             _context.Properties.Add(property);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetProperty), new { id = property.Id }, property);
@@ -38,11 +39,13 @@ namespace HomBase.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Property>> GetProperty(int id)
         {
-            var property = await _context.Properties.FindAsync(id);
+            var property = await _context.Properties
+                                         .Include(p => p.Interests)  // Include Interests
+                                         .FirstOrDefaultAsync(p => p.Id == id);
+
             if (property == null)
-            {
                 return NotFound();
-            }
+
             return property;
         }
 

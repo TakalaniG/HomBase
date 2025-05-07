@@ -1,0 +1,119 @@
+﻿@page "/add-property"
+@using HomBase.Client.Models
+@using HomBase.Client.Services
+@inject PropertyService PropertyService  // ✅ Inject PropertyService
+@rendermode InteractiveServer
+
+<h3 class="mb-4">Add New Property</h3>
+
+<div class="card shadow-sm p-4">
+    <div class="mb-3">
+        <label>Title</label>
+        <input class="form-control" @bind="property.Title" />
+    </div>
+    <div class="mb-3">
+        <label>Description</label>
+        <textarea class="form-control" @bind="property.Description"></textarea>
+    </div>
+    <div class="mb-3">
+        <label>Price</label>
+        <input type="number" class="form-control" @bind="property.Price" />
+    </div>
+    <div class="mb-3">
+        <label>Location</label>
+        <select class="form-control" @bind="property.LocationCode" style="color: @(string.IsNullOrEmpty(property.LocationCode) ? "red" : "black")">
+            <option value="" disabled selected style="color:orange;">Select Location</option>
+            <option value="JHB">Johannesburg</option>
+            <option value="PTA">Pretoria</option>
+            <option value="BFN">Bloemfontein</option>
+        </select>
+        @if (string.IsNullOrEmpty(property.LocationCode))
+        {
+            <small class="text-danger">Please select a location.</small>
+        }
+    </div>
+    <div class="mb-3">
+        <label>Bedrooms</label>
+        <input type="number" class="form-control" @bind="property.Bedrooms" />
+    </div>
+    <div class="mb-3">
+        <label>Bathrooms</label>
+        <input type="number" class="form-control" @bind="property.Bathrooms" />
+    </div>
+    <div class="mb-3">
+        <label>Size (sq. meters)</label>
+        <input type="number" class="form-control" @bind="property.Size" />
+    </div>
+    <div class="mb-3">
+        <label>Property Image</label>
+        <InputFile OnChange="(e) => OnFileSelected(e)" />
+    </div>
+
+    @if (previewImageUrl != null)
+    {
+        <div class="mb-3">
+            <img src="@previewImageUrl" alt="Preview" style="max-width: 300px; max-height: 300px; object-fit: cover; margin-top: 10px;" />
+        </div>
+    }
+
+    <button class="btn btn-primary" @onclick="SaveProperty">Add Property</button>
+
+    @if (successMessage != null)
+    {
+        <p class="text-success mt-3">@successMessage</p>
+    }
+    @if (errorMessage != null)
+    {
+        <p class="text-danger mt-3">@errorMessage</p>
+    }
+</div>
+
+@code {
+    private Property property = new Property();
+    private string? successMessage;
+    private string? errorMessage;
+    private byte[]? imageData;
+    private string? previewImageUrl;
+
+    private async Task SaveProperty()
+    {
+        try
+        {
+            //property.ImageData = Array.Empty<byte>();
+            property.ImageUrl = "";
+            property.Location = this.GetCityName(property.LocationCode);
+            await PropertyService.CreatePropertyAsync(property);
+            successMessage = "Property added successfully!";
+            errorMessage = null;
+            property = new Property(); // Clear the form after successful save
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error adding property: {ex.Message}";
+            successMessage = null;
+        }
+    }
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);  // 10 MB max
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            imageData = ms.ToArray();  // Store the image as a byte array
+            property.ImageData = imageData;
+
+            previewImageUrl = $"data:image/jpeg;base64,{Convert.ToBase64String(imageData)}";
+        }
+    }
+
+    private string GetCityName(string code) => code switch
+    {
+        "JHB" => "Johannesburg",
+        "PTA" => "Pretoria",
+        "BFN" => "Bloemfontein",
+        _ => "Unknown"
+    };
+}

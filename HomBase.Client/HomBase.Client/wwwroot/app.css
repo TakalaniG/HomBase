@@ -49,3 +49,20 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+/* Card default style */
+.hover-effect {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    background-color: #ffffff; /* Pure white */
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    height: 300px; /* Adjust height for a squarer look */
+    overflow: hidden;
+}
+
+    /* Card on hover */
+    .hover-effect:hover {
+        transform: translateY(-5px);
+        background-color: #f5f5f5; /* Smoky grey-white */
+        box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.1);
+    }

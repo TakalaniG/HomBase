@@ -20,5 +20,25 @@ namespace HomBase.Client.Services
         {
             return await _httpClient.GetFromJsonAsync<List<Property>>("api/properties") ?? new List<Property>();
         }
+
+        public async Task<Property> CreatePropertyAsync(Property property)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/properties", property);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<Property>();
+        }
+
+        public async Task DeletePropertyAsync(int id)
+        {
+            var response = await _httpClient.DeleteAsync($"api/properties/{id}");
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task<Property?> GetPropertyByIdAsync(int id)
+        {
+            var response = await _httpClient.GetAsync($"api/properties/{id}");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<Property>();
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HomBaseAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomBaseAPI.Data
 {
@@ -8,6 +9,9 @@ namespace HomBaseAPI.Data
     :   base(options) { }
 
         public DbSet<HomBaseAPI.Model.Property> Properties { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Interest> Interests { get; set; }
+        public DbSet<Assignment> Assignments { get; set; }
     }
 }
 
