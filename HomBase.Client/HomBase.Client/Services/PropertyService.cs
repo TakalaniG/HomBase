@@ -40,5 +40,11 @@ namespace HomBase.Client.Services
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<Property>();
         }
+
+        public async Task<bool> UpdatePropertyAsync(Property property)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"api/properties/{property.Id}", property);
+            return response.IsSuccessStatusCode;
+        }
     }
 }

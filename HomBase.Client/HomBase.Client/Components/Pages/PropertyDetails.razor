@@ -2,6 +2,8 @@
 @using HomBase.Client.Models
 @using HomBase.Client.Services
 @inject PropertyService PropertyService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <h3 class="mb-4">Property Details</h3>
 
@@ -37,18 +39,83 @@ else
                     }
                 </ul>
             }
+            <button class="btn btn-primary mt-3" @onclick="() => showEditModal = true">Edit Property</button>
             <a href="/properties" class="btn btn-primary mt-3">Back to Properties</a>
+        </div>
+    </div>
+    
+}
+@if (showEditModal)
+{
+    <div class="modal" tabindex="-1" role="dialog" style="display: block; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" @onclick="() => showEditModal = false">&times;</button>
+                    <h5 class="modal-title">Edit Property</h5>
+                </div>
+                <div class="modal-body">
+                    <form @onsubmit="SaveProperty">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" class="form-control" @bind="property.Title" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" @bind="property.Description" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Price</label>
+                            <input type="number" class="form-control" @bind="property.Price" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <select class="form-control" @bind="property.Location" required>
+                                <option value="JHB">Johannesburg</option>
+                                <option value="PTA">Pretoria</option>
+                                <option value="BFN">Bloemfontein</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Bedrooms</label>
+                            <input type="number" class="form-control" @bind="property.Bedrooms" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Bathrooms</label>
+                            <input type="number" class="form-control" @bind="property.Bathrooms" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Size (sqm)</label>
+                            <input type="number" class="form-control" @bind="property.Size" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="button" class="btn btn-default" @onclick="() => showEditModal = false">Cancel</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 }
 
+
 @code {
     [Parameter] public int id { get; set; }
     private Property property;
+    private byte[] imageData;
+    private string imagePreviewUrl;
+    private bool showEditModal = false;
 
     protected override async Task OnInitializedAsync()
     {
         property = await PropertyService.GetPropertyByIdAsync(id);
+    }
+
+    private async Task SaveProperty()
+    {
+        property.ImageData = imageData ?? property.ImageData;
+        await PropertyService.UpdatePropertyAsync(property);
+        showEditModal = false;
+        NavigationManager.NavigateTo("/properties");
     }
 }
 
