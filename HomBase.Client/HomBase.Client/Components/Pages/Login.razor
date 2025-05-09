@@ -1,0 +1,53 @@
+﻿@page "/login"
+@using HomBase.Client.Models
+@using HomBase.Client.Services
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+<h3>Login</h3>
+
+<div class="container mt-4">
+    <div class="card p-4 shadow-sm" style="max-width: 400px; margin: auto;">
+        <form @onsubmit="HandleLogin">
+            <div class="mb-3">
+                <label>Username</label>
+                <input type="text" class="form-control" @bind="loginRequest.Username" required />
+            </div>
+            <div class="mb-3">
+                <label>Password</label>
+                <input type="password" class="form-control" @bind="loginRequest.Password" required />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mt-3">@errorMessage</div>
+        }
+    </div>
+</div>
+
+@code {
+    private UserLogin loginRequest = new UserLogin();
+    private string errorMessage = string.Empty;
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var response = await HttpClient.PostAsJsonAsync("api/auth/login", loginRequest);
+            if (response.IsSuccessStatusCode)
+            {
+                // Redirect to properties page after successful login
+                NavigationManager.NavigateTo("/properties");
+            }
+            else
+            {
+                errorMessage = "Invalid credentials. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "An error occurred. Please try again later.";
+        }
+    }
+}

@@ -3,7 +3,6 @@ using System.Net.Http.Json;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using HomBase.Client.Models;
-//using HomBase.Client.Models; // Ensure you have shared models
 
 namespace HomBase.Client.Services
 {
