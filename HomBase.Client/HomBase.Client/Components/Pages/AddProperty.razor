@@ -1,7 +1,7 @@
 ﻿@page "/add-property"
 @using HomBase.Client.Models
 @using HomBase.Client.Services
-@inject PropertyService PropertyService  // ✅ Inject PropertyService
+@inject PropertyService PropertyService
 @rendermode InteractiveServer
 
 <h3 class="mb-4">Add New Property</h3>
@@ -17,11 +17,11 @@
     </div>
     <div class="mb-3">
         <label>Price</label>
-        <input type="number" class="form-control" @bind="property.Price" />
+        <input type="number" class="form-control" @bind="property.Price" min="0" />
     </div>
     <div class="mb-3">
         <label>Location</label>
-        <select class="form-control" @bind="property.LocationCode" style="color: @(string.IsNullOrEmpty(property.LocationCode) ? "red" : "black")">
+        <select class="form-control" @bind="property.LocationCode">
             <option value="" disabled selected style="color:orange;">Select Location</option>
             <option value="JHB">Johannesburg</option>
             <option value="PTA">Pretoria</option>
@@ -34,19 +34,19 @@
     </div>
     <div class="mb-3">
         <label>Bedrooms</label>
-        <input type="number" class="form-control" @bind="property.Bedrooms" />
+        <input type="number" class="form-control" @bind="property.Bedrooms" min="0" />
     </div>
     <div class="mb-3">
         <label>Bathrooms</label>
-        <input type="number" class="form-control" @bind="property.Bathrooms" />
+        <input type="number" class="form-control" @bind="property.Bathrooms" min="0" />
     </div>
     <div class="mb-3">
         <label>Size (sq. meters)</label>
-        <input type="number" class="form-control" @bind="property.Size" />
+        <input type="number" class="form-control" @bind="property.Size" min="0" />
     </div>
     <div class="mb-3">
         <label>Property Image</label>
-        <InputFile OnChange="(e) => OnFileSelected(e)" />
+        <InputFile OnChange="OnFileSelected" />
     </div>
 
     @if (previewImageUrl != null)
@@ -56,7 +56,7 @@
         </div>
     }
 
-    <button class="btn btn-primary" @onclick="SaveProperty">Add Property</button>
+    <button class="btn btn-primary" @onclick="SaveProperty" disabled="@(!IsFormValid())">Add Property</button>
 
     @if (successMessage != null)
     {
@@ -79,13 +79,13 @@
     {
         try
         {
-            //property.ImageData = Array.Empty<byte>();
-            property.ImageUrl = "";
-            property.Location = this.GetCityName(property.LocationCode);
+            property.Location = GetCityName(property.LocationCode);
+            property.ImageUrl = "ImageUrl";
             await PropertyService.CreatePropertyAsync(property);
             successMessage = "Property added successfully!";
             errorMessage = null;
-            property = new Property(); // Clear the form after successful save
+            property = new Property();
+            previewImageUrl = null;
         }
         catch (Exception ex)
         {
@@ -99,12 +99,11 @@
         var file = e.File;
         if (file != null)
         {
-            using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);  // 10 MB max
+            using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
             using var ms = new MemoryStream();
             await stream.CopyToAsync(ms);
-            imageData = ms.ToArray();  // Store the image as a byte array
+            imageData = ms.ToArray();
             property.ImageData = imageData;
-
             previewImageUrl = $"data:image/jpeg;base64,{Convert.ToBase64String(imageData)}";
         }
     }
@@ -116,4 +115,11 @@
         "BFN" => "Bloemfontein",
         _ => "Unknown"
     };
+
+    private bool IsFormValid() =>
+        !string.IsNullOrEmpty(property.Title) &&
+        !string.IsNullOrEmpty(property.Description) &&
+        property.Price > 0 &&
+        !string.IsNullOrEmpty(property.LocationCode) &&
+        imageData != null;
 }

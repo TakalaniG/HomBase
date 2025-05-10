@@ -14,8 +14,8 @@
         public byte[] ImageData { get; set; }
         public bool isOccupied { get; set; }
         public string LocationCode { get; set; }
-        public ICollection<Interest> Interests { get; set; }
-        public ICollection<Assignment> Assignments { get; set; }
+        //public ICollection<Interest>? Interests { get; set; }
+        //public ICollection<Assignment>? Assignments { get; set; }
 
         public decimal Price { get; set; }
     }

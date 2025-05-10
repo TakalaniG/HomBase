@@ -40,7 +40,7 @@ namespace HomBase.Controllers
         public async Task<ActionResult<Property>> GetProperty(int id)
         {
             var property = await _context.Properties
-                                         .Include(p => p.Interests)  // Include Interests
+                                         //.Include(p => p.Interests)  
                                          .FirstOrDefaultAsync(p => p.Id == id);
 
             if (property == null)

@@ -26,7 +26,7 @@ else
             <p class="card-text">Date Listed: @property.DateListed.ToString("yyyy-MM-dd")</p>
             <hr />
             <h6>Interested Users:</h6>
-            @if (property.Interests == null || !property.Interests.Any())
+            @* @if (property.Interests == null || !property.Interests.Any())
             {
                 <p class="text-muted">No users have shown interest yet.</p>
             }
@@ -38,7 +38,7 @@ else
                         <li class="list-group-item">User ID: @interest.UserId (Expressed interest on @interest.DateExpressed.ToString("yyyy-MM-dd"))</li>
                     }
                 </ul>
-            }
+            } *@
             <button class="btn btn-primary mt-3" @onclick="() => showEditModal = true">Edit Property</button>
             <a href="/properties" class="btn btn-primary mt-3">Back to Properties</a>
         </div>

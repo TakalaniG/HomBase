@@ -21,7 +21,7 @@ namespace HomBaseAPI.Model
         public bool isOccupied { get; set; }
         public string LocationCode { get; set; } // Date the property was listed 
         public byte[]? ImageData { get; set; }
-        public ICollection<Interest>? Interests { get; set; } = new List<Interest>();
-        public ICollection<Assignment>? Assignments { get; set; } = new List<Assignment>();
+        //public ICollection<Interest>? Interests { get; set; } = new List<Interest>();
+        //public ICollection<Assignment>? Assignments { get; set; } = new List<Assignment>();
     }
 }
