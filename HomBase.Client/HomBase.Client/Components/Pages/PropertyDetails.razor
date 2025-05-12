@@ -43,7 +43,7 @@ else
             <a href="/properties" class="btn btn-primary mt-3">Back to Properties</a>
         </div>
     </div>
-    
+
 }
 @if (showEditModal)
 {
@@ -88,7 +88,7 @@ else
                             <label>Size (sqm)</label>
                             <input type="number" class="form-control" @bind="property.Size" required />
                         </div>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="submit" class="btn btn-primary" disabled="@(!IsFormValid())">Save Changes</button>
                         <button type="button" class="btn btn-default" @onclick="() => showEditModal = false">Cancel</button>
                     </form>
                 </div>
@@ -117,5 +117,14 @@ else
         showEditModal = false;
         NavigationManager.NavigateTo("/properties");
     }
+
+    private bool IsFormValid() =>
+    !string.IsNullOrEmpty(property.Title) &&
+    !string.IsNullOrEmpty(property.Description) &&
+    property.Price > 0 &&
+    !string.IsNullOrEmpty(property.LocationCode) &&
+    property.Bedrooms > 0 &&
+    property.Bathrooms > 0 &&
+    property.Size > 0;
 }
 

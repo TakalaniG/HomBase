@@ -34,15 +34,15 @@
     </div>
     <div class="mb-3">
         <label>Bedrooms</label>
-        <input type="number" class="form-control" @bind="property.Bedrooms" min="0" />
+        <input type="number" class="form-control" @bind="property.Bedrooms" min="0" max="4" />
     </div>
     <div class="mb-3">
         <label>Bathrooms</label>
-        <input type="number" class="form-control" @bind="property.Bathrooms" min="0" />
+        <input type="number" class="form-control" @bind="property.Bathrooms" min="0" max="4"/>
     </div>
     <div class="mb-3">
         <label>Size (sq. meters)</label>
-        <input type="number" class="form-control" @bind="property.Size" min="0" />
+        <input type="number" class="form-control" @bind="property.Size" min="0"/>
     </div>
     <div class="mb-3">
         <label>Property Image</label>
@@ -121,5 +121,8 @@
         !string.IsNullOrEmpty(property.Description) &&
         property.Price > 0 &&
         !string.IsNullOrEmpty(property.LocationCode) &&
-        imageData != null;
+        imageData != null &&
+        property.Bedrooms > 0 &&
+        property.Bathrooms > 0 &&
+        property.Size > 0;
 }
